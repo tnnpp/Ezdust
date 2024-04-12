@@ -1,6 +1,8 @@
-<h1>Ezdust</h1>
-<div>
-    {% for i in indoor %}
-        {{i.pm2_5}}
-    {% endfor %}
-</div>
+{% extends "base.html" %}
+{% block content %}
+    <div>
+        {% for i in indoor %}
+            {{i.pm2_5}}
+        {% endfor %}
+    </div>
+{% endblock %}
