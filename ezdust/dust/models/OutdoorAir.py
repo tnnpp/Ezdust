@@ -6,5 +6,5 @@ class OutdoorAir(models.Model):
     time = models.DateTimeField(default=datetime.datetime.now())
     place = models.CharField(max_length=200)
     pm2_5 = models.IntegerField()
-    temp = models.DecimalField()
-    humidity = models.DecimalField()
+    temp = models.FloatField()
+    humidity = models.FloatField()
