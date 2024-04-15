@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+   {% for i in outdoor %}
+        {{i.pm2_5}}
+    {% endfor %}
+{% endblock %}

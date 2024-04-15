@@ -26,8 +26,20 @@
                     </div>
                 </div>
                 <div class="col-lg-3">
-
+                    <div class="link">
+                        <form action="{% url 'dust:predict'%}" method="get">
+                            <input type="submit" value="Indoor Air Predict">
+                        </form>
+                    </div>
                 </div>
+                <div class="col-lg-3">
+                    <div class="link">
+                        <form action="{% url 'dust:analyze'%}" method="get">
+                            <input type="submit" value="Health Risk Analysis">
+                        </form>
+                    </div>
+                </div>
+
                 <div class="message">
                     {% if messages %}
                             {% for message in messages %}
@@ -44,7 +56,10 @@
     {% endblock content %}
     </body>
     <footer>
-        <!-- Footer content -->
-        <p>Year-end project by Napasorn Tevarut and Thorung Boonkeaw</p>
+        <div class="foot">
+            <a href="{% url 'dust:home'%}">Home</a>
+            <p>Year-end project by Napasorn Tevarut and Thorung Boonkeaw</p>
+        </div>
+
     </footer>
 </html>

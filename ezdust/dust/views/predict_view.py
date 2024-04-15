@@ -1,8 +1,5 @@
 import datetime
-
 from django.shortcuts import render, redirect
-
-# Create your views here.
 from django.urls import reverse_lazy, reverse
 from django.views import generic
 from django.contrib import messages
