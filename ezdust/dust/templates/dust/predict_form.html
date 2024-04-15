@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+    <form action="{% url 'dust:predict' %}" method="post">
+        {{ form.district }}
+        {{ form.place }}
+        {{ form.people_num }}
+    </form>
+{% endblock %}
