@@ -1,0 +1,28 @@
+table {
+  width: 700px;
+  height:100%
+}
+tr {
+  height: 70px;
+}
+.form{
+    margin-top: 30px;
+    color: #12E1B9;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.form .btn{
+    width: 238px;
+    height: 45px;
+    border: 2px solid #12E1B9;
+    color: #12E1B9;
+    background-color: transparent;
+    margin-left: 35%;
+}
+.form .btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #FFA0F0;
+    border-color: #FFA0F0;
+}
