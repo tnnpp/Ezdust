@@ -55,7 +55,20 @@ def PredictResultView(request, pk):
     # get result's IndoorAir object
     try:
         result = IndoorAir.objects.get(pk=pk)
+        if result.pm2_5 < 0:
+            text = "Impossible"
+        if result.pm2_5 <= 25:
+            text = "Very Good air quality!"
+        elif 26 <= result.pm2_5 <= 50:
+            text = "Good air quality"
+        elif 51 <= result.pm2_5 <= 100:
+            text = "Moderate air quality"
+        elif 101 <= result.pm2_5 <= 150:
+            text = "Unhealthy air quality"
+        else:
+            text = "Very Unhealthy"
     except:
+        text = None
         result = None
         messages.error(request, "Haven't Predict yet.")
-    return render(request, 'dust/result.html', {'result': result})
+    return render(request, 'dust/result.html', {'result': result, 'text': text})

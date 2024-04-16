@@ -3,6 +3,31 @@
 {% load static %}
     <link rel="stylesheet" href="{% static 'dust/result.css' %}">
     <div class="result">
-        {{ result.pm2_5 }}
+        {% if "Very Good" in text %}
+            <div class="verygood">
+                <h1>{{ result.pm2_5 }}</h1>
+                <h2>{{ text }}</h2>
+            </div>
+        {% elif "Good" in text %}
+            <div class="good">
+                <h1>{{ result.pm2_5 }}</h1>
+                <h2>{{ text }}</h2>
+            </div>
+        {% elif "Moderate" in text %}
+            <div class="moderate">
+                <h1>{{ result.pm2_5 }}</h1>
+                <h2>{{ text }}</h2>
+            </div>
+        {% elif "Very Unhealthy" in text %}
+            <div class="veryunhealthy">
+                <h1>{{ result.pm2_5 }}</h1>
+                <h2>{{ text }}</h2>
+            </div>
+        {% elif "Unhealthy" in text %}
+            <div class="unhealthy">
+                <h1>{{ result.pm2_5 }}</h1>
+                <h2>{{ text }}</h2>
+            </div>
+        {% endif %}
     </div>
 {% endblock %}

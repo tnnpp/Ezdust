@@ -1,3 +1,25 @@
 .result {
-    color: white;
+    display: flex;
+    align-items: center; /* Vertically center content */
+    justify-content: center; /* Horizontally center content */
+    margin-top: 8vw;
+}
+.result h1{
+    text-align: center;
+    margin-bottom: 40px;
+}
+.verygood{
+    color: #00C9ED;
+}
+.good{
+    color: #85ED00;
+}
+.moderate{
+    color: #E8ED00;
+}
+.unhealthy{
+    color: #ED9500;
+}
+.veryunhealthy{
+    color: #ED4000;
 }
