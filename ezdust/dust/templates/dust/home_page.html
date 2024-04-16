@@ -1,8 +1,36 @@
 {% extends "base.html" %}
 {% block content %}
-    <div>
-        {% for i in indoor %}
-            {{i.pm2_5}}
-        {% endfor %}
+    <div class="row">
+        <div class="col-md-6">]
+            {% if indoor %}
+                {% for i in indoor %}
+                    {{i.pm2_5}}
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="col-md-5">
+            <div id="map" style="width: 50vwx; height: 35vw;"></div>
+        </div>
     </div>
+    <script>
+        function initMap() {
+        var districts = JSON.parse("{{district|escapejs}}");
+        let map = new google.maps.Map(document.getElementById('map'), {
+            center: { lat: 13.736717, lng: 100.523186 },
+            zoom: 10,
+            disableDefaultUI: true // Remove default UI controls
+        });
+
+        for (var i = 0; i < districts.length; i++) {
+            let marker = new google.maps.Marker({
+                position: new google.maps.LatLng(districts[i][0], districts[i][1]),
+                icon: 'http://maps.google.com/mapfiles/ms/icons/' + "red" + '-dot.png'
+            });
+            marker.setMap(map);
+        }
+
+        }
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCD9vS77EnFLsw_LgezWGdoggsRqSvbvxw&callback=initMap">
+    </script>
 {% endblock %}
