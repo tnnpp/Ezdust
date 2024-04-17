@@ -15,6 +15,7 @@
     <script>
         function initMap() {
         var districts = JSON.parse("{{district|escapejs}}");
+        var pm = JSON.parse("{{outdoor_pm|escapejs}}");
         let map = new google.maps.Map(document.getElementById('map'), {
             center: { lat: 13.736717, lng: 100.523186 },
             zoom: 10,
@@ -22,12 +23,35 @@
         });
 
         for (var i = 0; i < districts.length; i++) {
+            var color = assign_color(pm[i])
             let marker = new google.maps.Marker({
                 position: new google.maps.LatLng(districts[i][0], districts[i][1]),
-                icon: 'http://maps.google.com/mapfiles/ms/icons/' + "red" + '-dot.png'
+                icon: 'http://maps.google.com/mapfiles/ms/icons/' + color + '-dot.png'
             });
             marker.setMap(map);
         }
+        function assign_color(result){
+    var color;
+    if (result == -1) {
+        color = "pink";
+    }
+    else if (result >= 0 && result <= 25) {
+        color = "blue";
+    }
+    else if (result >= 26 && result <= 50) {
+        color = "green";
+    }
+    else if (result >= 51 && result <= 100) {
+        color = "yellow";
+    }
+    else if (result >= 101 && result <= 150) {
+        color = "orange";
+    }
+    else {
+        color = "red";
+    }
+    return color;
+}
 
         }
     </script>

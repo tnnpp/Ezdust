@@ -74,9 +74,27 @@ class HomePageView(generic.ListView):
             location.append(j)
         return location
 
+    def district_pm(self):
+        indoor_list = []
+        outdoor_list = []
+        for i in bangkok_districts.keys():
+            try:
+                print(i)
+                pm = IndoorAir.objects.get(place= i)
+                indoor_list.append(pm.pm2_5)
+                outdoor_list.append(pm.outdoor.pm2_5)
+            except:
+                pm = -1
+                indoor_list.append(pm)
+                outdoor_list.append(pm)
+        return indoor_list, outdoor_list
+
+
+
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['Health'] = Health.objects.all()
+        context['health'] = Health.objects.all()
         context['district'] = self.convert_district()
+        context['indoor_pm'], context['outdoor_pm'] = self.district_pm()
         return context
 
