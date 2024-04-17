@@ -1,0 +1,51 @@
+.box{
+    display: flex;
+    border: 3px solid #12E1B9;
+    width: 33vw;
+    height: 90%;
+    flex-direction: column;
+    margin-left : 10vw;
+    margin-top: 3vw;
+    color: white;
+    overflow-x: auto;
+}
+@media (min-width: 1000px) {
+    section {
+        width: 55%;
+    }
+  }
+
+.inner_block{
+    padding: 10px;
+    border: 2px solid #12E1B9;
+    display: flex;
+    color: #12E1B9;
+}
+.inner_block:hover{
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: #FFA0F0;
+}
+
+.inner_block p{
+    margin-left: 20px;
+}
+
+.inner_block h5{
+    margin-left: 10px;
+}
+.good{
+    color: #85ED00;
+}
+.verygood{
+    color: #00C9ED;
+}
+
+.moderate{
+    color: #E8ED00;
+}
+.unhealthy{
+    color: #ED9500;
+}
+.veryunhealthy{
+    color: #ED4000;
+}

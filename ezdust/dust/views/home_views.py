@@ -2,6 +2,9 @@ from django.shortcuts import render
 from django.views import generic
 from ..models import OutdoorAir, IndoorAir, Health
 import datetime
+from django.db.models import Q
+from django.utils import timezone
+
 bangkok_districts = {
     "Bang_Bon": [13.6592, 100.3991],
     "Bang_Kapi": [13.765833, 100.647778],
@@ -63,10 +66,15 @@ class HomePageView(generic.ListView):
 
     def get_queryset(self):
         """
-        Return all OutdoorAir in bangkok
+        Return latest time of IndoorAir of each place in bangkok
         """
-        all_indoor = IndoorAir.objects.all()
-        return all_indoor
+        query = Q()
+        for i in bangkok_districts.keys():
+            latest_indoor = IndoorAir.objects.filter(time__lte=datetime.datetime.now(), place=i).order_by(
+                '-time').first()
+            if latest_indoor:
+                query |= Q(pk=latest_indoor.pk)
+        return IndoorAir.objects.filter(query)
 
     def convert_district(self):
         location = []
@@ -81,7 +89,6 @@ class HomePageView(generic.ListView):
             try:
                 pm = IndoorAir.objects.filter(time__lte=datetime.datetime.now(), place=i).order_by(
                     '-time').first()
-                # pm = IndoorAir.objects.get(place= i)
                 indoor_list.append(pm.pm2_5)
                 outdoor_list.append(pm.outdoor.pm2_5)
             except:
@@ -90,12 +97,47 @@ class HomePageView(generic.ListView):
                 outdoor_list.append(pm)
         return indoor_list, outdoor_list
 
+    def assign_level(self):
+        pm = self.get_queryset()
+        indoor_level = []
+        outdoor_level = []
+        for i in pm:
+            text = ""
+            text1 = ""
+            if i.pm2_5 < 0:
+                text = "Impossible"
+            if 0 <= i.pm2_5 <= 25:
+                text = "Very Good air quality!"
+            elif 26 <= i.pm2_5 <= 50:
+                text = "Good air quality"
+            elif 51 <= i.pm2_5 <= 100:
+                text = "Moderate air quality"
+            elif 101 <= i.pm2_5 <= 150:
+                text = "Unhealthy air quality"
+            elif i.pm2_5 >= 151:
+                text = "Very Unhealthy"
 
+            if i.outdoor.pm2_5 < 0:
+                text1 = "Impossible"
+            if 0 <= i.outdoor.pm2_5 <= 25:
+                text1 = "Very Good air quality!"
+            elif 26 <= i.outdoor.pm2_5 <= 50:
+                text1 = "Good air quality"
+            elif 51 <= i.outdoor.pm2_5 <= 100:
+                text1 = "Moderate air quality"
+            elif 101 <= i.outdoor.pm2_5 <= 150:
+                text1 = "Unhealthy air quality"
+            elif i.outdoor.pm2_5 >= 151:
+                text1 = "Very Unhealthy"
+            indoor_level.append(text)
+            outdoor_level.append(text1)
+        return indoor_level, outdoor_level
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['health'] = Health.objects.all()
         context['district'] = self.convert_district()
         context['indoor_pm'], context['outdoor_pm'] = self.district_pm()
+        context['indoor_level'], context['outdoor_level'] = self.assign_level()
         return context
 

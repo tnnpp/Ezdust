@@ -1,17 +1,51 @@
 {% extends "base.html" %}
 {% block content %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'dust/home.css' %}">
     <div class="row">
         <div class="col-md-6">]
-            {% if indoor %}
+            <div class="box">
                 {% for i in indoor %}
-                    {{i.pm2_5}}
+
+                    <div class="inner_block">
+                        <h4>{{i.place}}</h4>
+                        <p>Outdoor PM 2.5 : </p>
+                            <h5 id="outdoor_pm_value{{ forloop.counter }}">{{i.outdoor.pm2_5}}</h5>
+                        <p>Indoor PM 2.5 : </p>
+                            <h5 id="indoor_pm_value{{ forloop.counter }}">{{i.pm2_5}}</h5>
+                    </div>
+                    <script>
+                        var outdoor_pm = "{{ i.outdoor.pm2_5 }}";
+                        var indoor_pm = "{{ i.pm2_5 }}";
+
+                        function getClass(pm) {
+                            if (pm >= 0 && pm <= 25) {
+                                return "verygood";
+                            } else if (pm >= 26 && pm <= 50) {
+                                return "good";
+                            } else if (pm >= 51 && pm <= 100) {
+                                return "moderate";
+                            } else if (pm >= 101 && pm <= 150) {
+                                return "unhealthy";
+                            } else {
+                                return "veryunhealthy";
+                            }
+                        }
+
+                        var outdoor_pm_element = document.getElementById("outdoor_pm_value{{ forloop.counter }}");
+                        outdoor_pm_element.className = getClass(outdoor_pm);
+
+                        var indoor_pm_element = document.getElementById("indoor_pm_value{{ forloop.counter }}");
+                        indoor_pm_element.className = getClass(indoor_pm);
+                    </script>
                 {% endfor %}
-            {% endif %}
+            </div>
         </div>
         <div class="col-md-5">
-            <div id="map" style="width: 50vwx; height: 35vw;"></div>
+            <div id="map" style="width: 45vw; height: 35vw; margin-top: 1vw;"></div>
         </div>
     </div>
+
     <script>
         function initMap() {
         var districts = JSON.parse("{{district|escapejs}}");
