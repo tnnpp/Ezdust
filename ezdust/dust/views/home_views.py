@@ -1,3 +1,5 @@
+import json
+
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import generic
@@ -58,100 +60,72 @@ bangkok_districts = {
     "Watthana": [13.742222, 100.585833],
     "Yan_Nawa": [13.696944, 100.543056]
 }
+districts_json = json.dumps(bangkok_districts)
 
 
-class HomePageView(generic.ListView):
+def get_queryset():
+    """
+    Return latest time of IndoorAir of each place in bangkok
+    """
+    query = Q()
+    for i in bangkok_districts.keys():
+        latest_indoor = IndoorAir.objects.filter(time__lte=datetime.datetime.now(), place=i).order_by(
+            '-time').first()
+        if latest_indoor:
+            query |= Q(pk=latest_indoor.pk)
+    return IndoorAir.objects.filter(query)
+
+
+def district_pm():
+    indoor_list = []
+    outdoor_list = []
+    query = get_queryset()
+
+    for j in bangkok_districts.keys():
+        in_pm = -1
+        out_pm = -1
+        for i in query:
+            if j == i.place:
+                in_pm = i.pm2_5
+                out_pm = i.outdoor.pm2_5
+        indoor_list.append(in_pm)
+        outdoor_list.append(out_pm)
+    return outdoor_list, indoor_list
+
+def get_query_pk():
+    query = get_queryset()
+    pk_list = []
+    for j in bangkok_districts.keys():
+        pk = 0
+        for i in query:
+            if j == i.place:
+                pk = i.pk
+        pk_list.append(pk)
+    return pk_list
+def HomePageView(request):
     """View for the home page displaying data of air quality in each district in bangkok."""
-    template_name = 'dust/home_page.html'
-    context_object_name = 'indoor'
-
-    def get_queryset(self):
-        """
-        Return latest time of IndoorAir of each place in bangkok
-        """
-        query = Q()
-        for i in bangkok_districts.keys():
-            latest_indoor = IndoorAir.objects.filter(time__lte=datetime.datetime.now(), place=i).order_by(
-                '-time').first()
-            if latest_indoor:
-                query |= Q(pk=latest_indoor.pk)
-        return IndoorAir.objects.filter(query)
-
-    def convert_district(self):
-        location = []
-        for i,j in bangkok_districts.items():
-            location.append(j)
-        return location
-
-    def district_pm(self):
-        indoor_list = []
-        outdoor_list = []
-        for i in bangkok_districts.keys():
-            try:
-                pm = IndoorAir.objects.filter(time__lte=datetime.datetime.now(), place=i).order_by(
-                    '-time').first()
-                indoor_list.append(pm.pm2_5)
-                outdoor_list.append(pm.outdoor.pm2_5)
-            except:
-                pm = -1
-                indoor_list.append(pm)
-                outdoor_list.append(pm)
-        return indoor_list, outdoor_list
-
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['health'] = Health.objects.all()
-        context['district'] = self.convert_district()
-        context['indoor_pm'], context['outdoor_pm'] = self.district_pm()
-        return context
+    indoor = get_queryset()
+    outdoor_list, indoor_list = district_pm()
+    health = Health.objects.all()
+    pk = get_query_pk()
+    print(outdoor_list)
+    print(len(pk))
+    return render(request, 'dust/home_page.html', {'query_pk':pk,'health': health,'district': districts_json, 'indoor': indoor, 'outdoor_pm': outdoor_list, 'indoor_pm': indoor_list})
 
 
 def HomeDetail(request, pk):
-    # convert district's lat lng into list
-    district = []
-    for i, j in bangkok_districts.items():
-        district.append(j)
-    # get outdoor,indoor pm list
-    indoor_list = []
-    outdoor_list = []
-    for i in bangkok_districts.keys():
-        try:
-            pm = IndoorAir.objects.filter(time__lte=datetime.datetime.now(), place=i).order_by(
-                '-time').first()
-            indoor_list.append(pm.pm2_5)
-            outdoor_list.append(pm.outdoor.pm2_5)
-        except:
-            pm = -1
-            indoor_list.append(pm)
-            outdoor_list.append(pm)
-
+    qpk = get_query_pk()
+    outdoor_list, indoor_list = district_pm()
     # get choosed indoor objects
     indoor = IndoorAir.objects.get(pk=pk)
-    return render(request, 'dust/home_detail.html', {'district': district, 'indoor': indoor, 'outdoor_pm': outdoor_list, 'indoor_pm': indoor_list})
+    return render(request, 'dust/home_detail.html', {'query_pk':qpk, 'district': districts_json, 'indoor': indoor, 'outdoor_pm': outdoor_list, 'indoor_pm': indoor_list})
 
 def SearchBar(request):
-    # convert district's lat lng into list
-    district = []
-    for i, j in bangkok_districts.items():
-        district.append(j)
-    # get outdoor,indoor pm list
-    indoor_list = []
-    outdoor_list = []
-    for i in bangkok_districts.keys():
-        try:
-            pm = IndoorAir.objects.filter(time__lte=datetime.datetime.now(), place=i).order_by(
-                '-time').first()
-            indoor_list.append(pm.pm2_5)
-            outdoor_list.append(pm.outdoor.pm2_5)
-        except:
-            pm = -1
-            indoor_list.append(pm)
-            outdoor_list.append(pm)
-
+    pk = get_query_pk()
+    outdoor_list, indoor_list = district_pm()
     if request.method == 'POST':
         query = request.POST.get('query', '')
         results = IndoorAir.objects.filter(place__contains=query)
         for i in results:
             print(i.place)
-    return render(request, 'dust/home_page.html', {'district': district, 'indoor': results, 'outdoor_pm': outdoor_list, 'indoor_pm': indoor_list})
+    return render(request, 'dust/home_page.html', {'query_pk':pk, 'district': districts_json, 'indoor': results, 'outdoor_pm': outdoor_list, 'indoor_pm': indoor_list})

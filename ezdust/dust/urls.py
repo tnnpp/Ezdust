@@ -4,7 +4,7 @@ from . import views
 
 app_name = 'dust'
 urlpatterns = [
-    path('', views.HomePageView.as_view(), name='home'),
+    path('', views.HomePageView, name='home'),
     path('<int:pk>', views.HomeDetail, name='detail'),
     path('search', views.SearchBar, name='search'),
     path('predict', views.PredictView, name='predict'),

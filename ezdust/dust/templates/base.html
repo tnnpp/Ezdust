@@ -64,21 +64,37 @@
     </footer>
     <script>
         function initMap() {
-        var districts = JSON.parse("{{district|escapejs}}");
-        var pm = JSON.parse("{{outdoor_pm|escapejs}}");
-        let map = new google.maps.Map(document.getElementById('map'), {
-            center: { lat: 13.736717, lng: 100.523186 },
-            zoom: 10,
-            disableDefaultUI: true // Remove default UI controls
-        });
-
-        for (var i = 0; i < districts.length; i++) {
-            var color = assign_color(pm[i])
-            let marker = new google.maps.Marker({
-                position: new google.maps.LatLng(districts[i][0], districts[i][1]),
-                icon: 'http://maps.google.com/mapfiles/ms/icons/' + color + '-dot.png'
+            var districts = JSON.parse("{{district|escapejs}}");
+            var pm = JSON.parse("{{outdoor_pm|escapejs}}");
+            var pk = JSON.parse("{{query_pk|escapejs}}");
+            let map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: 13.736717, lng: 100.523186 },
+                zoom: 10,
+                disableDefaultUI: true
             });
-            marker.setMap(map);
+            var i = 0;
+            for(var key in districts) {
+                if (districts.hasOwnProperty(key)){
+                    var color = assign_color(pm[i]);
+                    let marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(districts[key][0], districts[key][1]),
+                        icon: 'http://maps.google.com/mapfiles/ms/icons/' + color + '-dot.png'
+                    });
+                    marker.districtName = key;
+                    marker.setMap(map);
+                    // add listener
+                    (function(marker, pk) {
+                        if (pk > 0) {
+                            var url = '/home/' + pk;
+                            marker.addListener('click', function() {
+                                // Redirect to another page with the pk of model
+                                window.location.href = url;
+                            });
+                        }
+                    })(marker, pk[i]);
+                    i = i+1;
+                }
+            }
         }
         function assign_color(result){
         var color;
@@ -101,9 +117,10 @@
             color = "red";
         }
         return color;
+
     }
 
-        }
+
     </script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBD10-SIHXzcvWAnaIi6b_5ABoJcuu-_Pg&callback=initMap">
     </script>
