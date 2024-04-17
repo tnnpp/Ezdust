@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views import generic
 from ..models import OutdoorAir, IndoorAir, Health
-
+import datetime
 bangkok_districts = {
     "Bang_Bon": [13.6592, 100.3991],
     "Bang_Kapi": [13.765833, 100.647778],
@@ -79,8 +79,9 @@ class HomePageView(generic.ListView):
         outdoor_list = []
         for i in bangkok_districts.keys():
             try:
-                print(i)
-                pm = IndoorAir.objects.get(place= i)
+                pm = IndoorAir.objects.filter(time__lte=datetime.datetime.now(), place=i).order_by(
+                    '-time').first()
+                # pm = IndoorAir.objects.get(place= i)
                 indoor_list.append(pm.pm2_5)
                 outdoor_list.append(pm.outdoor.pm2_5)
             except:
