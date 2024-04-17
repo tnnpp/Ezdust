@@ -4,6 +4,12 @@
     <link rel="stylesheet" href="{% static 'dust/detail.css' %}">
     <div class="row">
         <div class="col-md-6">]
+            <div class="search">
+                <form method="post" action="{% url 'dust:search' %}">
+                    {% csrf_token %}
+                    <input type="text" name="query" placeholder="Search District" />
+                  </form>
+            </div>
             <div class="box">
                 <div class="inner_block">
                     <div class="header">
