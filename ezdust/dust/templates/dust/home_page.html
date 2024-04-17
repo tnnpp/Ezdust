@@ -6,13 +6,17 @@
         <div class="col-md-6">]
             <div class="box">
                 {% for i in indoor %}
-
                     <div class="inner_block">
                         <h4>{{i.place}}</h4>
                         <p>Outdoor PM 2.5 : </p>
                             <h5 id="outdoor_pm_value{{ forloop.counter }}">{{i.outdoor.pm2_5}}</h5>
                         <p>Indoor PM 2.5 : </p>
                             <h5 id="indoor_pm_value{{ forloop.counter }}">{{i.pm2_5}}</h5>
+                        <div class="detail">
+                            <form action="{% url 'dust:detail' i.pk %}" method="get">
+                                <input type="submit" value="More Detail">
+                            </form>
+                        </div>
                     </div>
                     <script>
                         var outdoor_pm = "{{ i.outdoor.pm2_5 }}";
@@ -46,49 +50,6 @@
         </div>
     </div>
 
-    <script>
-        function initMap() {
-        var districts = JSON.parse("{{district|escapejs}}");
-        var pm = JSON.parse("{{outdoor_pm|escapejs}}");
-        let map = new google.maps.Map(document.getElementById('map'), {
-            center: { lat: 13.736717, lng: 100.523186 },
-            zoom: 10,
-            disableDefaultUI: true // Remove default UI controls
-        });
 
-        for (var i = 0; i < districts.length; i++) {
-            var color = assign_color(pm[i])
-            let marker = new google.maps.Marker({
-                position: new google.maps.LatLng(districts[i][0], districts[i][1]),
-                icon: 'http://maps.google.com/mapfiles/ms/icons/' + color + '-dot.png'
-            });
-            marker.setMap(map);
-        }
-        function assign_color(result){
-    var color;
-    if (result == -1) {
-        color = "pink";
-    }
-    else if (result >= 0 && result <= 25) {
-        color = "blue";
-    }
-    else if (result >= 26 && result <= 50) {
-        color = "green";
-    }
-    else if (result >= 51 && result <= 100) {
-        color = "yellow";
-    }
-    else if (result >= 101 && result <= 150) {
-        color = "orange";
-    }
-    else {
-        color = "red";
-    }
-    return color;
-}
 
-        }
-    </script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCD9vS77EnFLsw_LgezWGdoggsRqSvbvxw&callback=initMap">
-    </script>
 {% endblock %}

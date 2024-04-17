@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'dust/detail.css' %}">
+    <div class="row">
+        <div class="col-md-6">]
+            <div class="box">
+                <div class="inner_block">
+                    <div class="header">
+                        <h1 id="outdoor_pm_value">{{indoor.outdoor.pm2_5}} </h1>
+                        <h1 id="text_value"></h1>
+                    </div>
+                        <h5>{{indoor.place}} District</h5>
+                    <div class="indoor">
+                        <h5>Indoor Analysis: </h5>
+                        <h4 id="indoor_pm_value">{{indoor.pm2_5}}</h4>
+                    </div>
+                </div>
+                <script>
+                    var outdoor_pm = "{{ indoor.outdoor.pm2_5 }}";
+                    var indoor_pm = "{{ indoor.pm2_5 }}";
+
+                    function getClass(pm) {
+                       if (pm >= 0 && pm <= 25) {
+                            return { text: "Very Good air quality!", class: "verygood" };
+                        } else if (pm >= 26 && pm <= 50) {
+                            return { text: "Good air quality", class: "good" };
+                        } else if (pm >= 51 && pm <= 100) {
+                            return { text: "Moderate air quality", class: "moderate" };
+                        } else if (pm >= 101 && pm <= 150) {
+                            return { text: "Unhealthy air quality", class: "unhealthy" };
+                        } else {
+                            return { text: "Very Unhealthy", class: "veryunhealthy" };
+                    }
+                        }
+
+                    var outdoor_pm_element = document.getElementById("outdoor_pm_value");
+                    var get_outdoor = getClass(outdoor_pm);
+                    outdoor_pm_element.className = get_outdoor.class;
+                    var outdoor_text_element = document.getElementById("text_value");
+                    outdoor_text_element.textContent = get_outdoor.text;
+                    outdoor_text_element.className = get_outdoor.class;
+
+                    var indoor_pm_element = document.getElementById("indoor_pm_value");
+                    var get_indoor = getClass(indoor_pm);
+                    indoor_pm_element.className = get_indoor.class;
+                </script>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div id="map" style="width: 45vw; height: 35vw; margin-top: 1vw;"></div>
+        </div>
+    </div>
+
+
+
+{% endblock %}

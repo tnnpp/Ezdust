@@ -105,3 +105,26 @@ class HomePageView(generic.ListView):
         context['indoor_pm'], context['outdoor_pm'] = self.district_pm()
         return context
 
+def HomeDetail(request, pk):
+    # convert district's lat lng into list
+    district = []
+    for i, j in bangkok_districts.items():
+        district.append(j)
+    # get outdoor,indoor pm list
+    indoor_list = []
+    outdoor_list = []
+    for i in bangkok_districts.keys():
+        try:
+            pm = IndoorAir.objects.filter(time__lte=datetime.datetime.now(), place=i).order_by(
+                '-time').first()
+            indoor_list.append(pm.pm2_5)
+            outdoor_list.append(pm.outdoor.pm2_5)
+        except:
+            pm = -1
+            indoor_list.append(pm)
+            outdoor_list.append(pm)
+
+    # get choosed indoor objects
+    indoor = IndoorAir.objects.get(pk=pk)
+    return render(request, 'dust/home_detail.html', {'district': district, 'indoor': indoor, 'outdoor_pm': outdoor_list, 'indoor_pm': indoor_list})
+

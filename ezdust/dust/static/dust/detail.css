@@ -1,0 +1,51 @@
+.box{
+    display: flex;
+    border: 3px solid #12E1B9;
+    width: 33vw;
+    height: 90%;
+    flex-direction: column;
+    margin-left : 10vw;
+    margin-top: 3vw;
+    color: white;
+    overflow-x: auto;
+}
+@media (min-width: 1000px) {
+    section {
+        width: 55%;
+    }
+  }
+
+.header{
+    display: flex;
+}
+.header h1{
+    margin-right: 20px;
+}
+
+.inner_block{
+    margin-left: 5%;
+    margin-top: 5%;
+}
+
+.inner_block h5{
+    color: #12E1B9;
+    margin-right: 10px;
+}
+.indoor{
+    display: flex;
+}
+.good{
+    color: #85ED00;
+}
+.verygood{
+    color: #00C9ED;
+}
+.moderate{
+    color: #E8ED00;
+}
+.unhealthy{
+    color: #ED9500;
+}
+.veryunhealthy{
+    color: #ED4000;
+}

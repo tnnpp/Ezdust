@@ -5,6 +5,7 @@ from . import views
 app_name = 'dust'
 urlpatterns = [
     path('', views.HomePageView.as_view(), name='home'),
+    path('<int:pk>', views.HomeDetail, name='detail'),
     path('predict', views.PredictView, name='predict'),
     path('predict/result/<int:pk>', views.PredictResultView, name='result'),
     path('analyze', views.AnalyzeView, name='analyze')
