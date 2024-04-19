@@ -34,7 +34,7 @@
                 </div>
                 <div class="col-md-3">
                     <div class="link">
-                        <form action="{% url 'dust:analyze'%}" method="get">
+                        <form class="link1" action="{% url 'dust:analyze'%}" method="get">
                             <input type="submit" value="Health Risk Analysis">
                         </form>
                     </div>
@@ -54,7 +54,6 @@
         </header>
     {% block content %}
     {% endblock content %}
-    </body>
     <footer>
         <div class="foot">
             <a href="{% url 'dust:home'%}">Home</a>
@@ -124,4 +123,5 @@
     </script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBD10-SIHXzcvWAnaIi6b_5ABoJcuu-_Pg&callback=initMap">
     </script>
+    </body>
 </html>

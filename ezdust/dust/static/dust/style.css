@@ -71,5 +71,19 @@ footer a{
 footer a:hover{
     color: #FFA0F0;
 }
+@media (max-width: 750px) {
+    .link1{
+    margin-top: 5vw;
+    }
+    .link{
+        display: flex;
+        margin-left: 66vw;
+        margin-top: -10vw;
+    }
+    .link input {
+        width: 150px;
+        height: 30px;
+
+  }
 
 
