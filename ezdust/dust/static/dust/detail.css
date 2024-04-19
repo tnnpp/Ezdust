@@ -1,20 +1,14 @@
 .box{
     display: flex;
     border: 3px solid #12E1B9;
-    width: 33vw;
+    width: 40vw;
     height: 90%;
     flex-direction: column;
-    margin-left : 10vw;
+    margin-left : 7vw;
     margin-top: 20px;
     color: white;
     overflow-x: auto;
 }
-@media (min-width: 1000px) {
-    section {
-        width: 55%;
-    }
-  }
-
 .header{
     display: flex;
 }
@@ -27,8 +21,8 @@
     margin-top: 5%;
 }
 .search input{
-    margin-left: 10vw;
-    width: 33vw;
+    margin-left: 7vw;
+    width: 40vw;
 }
 
 .inner_block h5{
@@ -53,3 +47,24 @@
 .veryunhealthy{
     color: #ED4000;
 }
+.map{
+    width: 45vw;
+    height: 35vw;
+    margin-top: 1vw
+}
+
+@media (max-width: 750px) {
+    .box {
+        width: 80vw;
+        height: 30vw;
+    }
+    .map{
+        margin-left: 10%;
+        width: 80vw;
+        hight: 45%;
+
+    }
+    .search input{
+        width: 80vw;
+    }
+  }

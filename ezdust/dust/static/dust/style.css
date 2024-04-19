@@ -56,16 +56,13 @@ body {
 
 footer p{
     color: #12E1B9;
-    margin-left: 5%;
-    position: absolute;
-    bottom: 5%;
+    margin-top: 1vw;
+    margin-left: 5vw;
     font-size: 12px;
 }
 footer a{
     color: #12E1B9;
-    position: absolute;
-    bottom: 8%;
-    right: 10%;
+    margin-left: 90vw;
     font-size: 20px;
 }
 footer a:hover{

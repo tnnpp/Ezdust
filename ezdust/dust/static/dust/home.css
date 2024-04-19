@@ -1,17 +1,17 @@
 .box{
     display: flex;
     border: 3px solid #12E1B9;
-    width: 33vw;
+    width: 40vw;
     height: 90%;
     flex-direction: column;
-    margin-left : 10vw;
+    margin-left : 7vw;
     margin-top: 20px;
     color: white;
     overflow: auto;
 }
 .search input{
-    margin-left: 10vw;
-    width: 33vw;
+    margin-left: 7vw;
+    width: 40vw;
 }
 .map{
     width: 45vw;
@@ -32,8 +32,6 @@
     .search input{
         width: 80vw;
     }
-
-
   }
 
 .inner_block{
