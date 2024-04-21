@@ -23,5 +23,4 @@ urlpatterns = [
                                   permanent=False)),
     path('admin/', admin.site.urls),
     path('home/', include('dust.urls')),
-    path('api/', include('api.urls')),
 ]
