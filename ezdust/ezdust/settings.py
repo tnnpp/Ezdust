@@ -38,7 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'dust'
+    'dust',
+    'api',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
@@ -77,8 +79,12 @@ WSGI_APPLICATION = 'ezdust.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'b6510545519',
+        'USER': 'b6510545519',
+        'PASSWORD': 'napasorn.te@ku.th',
+        'HOST': 'iot.cpe.ku.ac.th',
+        'PORT': '3306'
     }
 }
 
