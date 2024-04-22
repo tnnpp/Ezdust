@@ -53,16 +53,19 @@
         </div>
         <div class="col-md-5">
             <div class="map" id="map"></div>
-            <form method="post" id="toggle" action="{% url 'dust:indoormode' %}">
-                {% csrf_token %}
-                <label class="switch">
-                  <input type="checkbox" name="switch" velue='yes' onchange="document.getElementById('toggle').submit()"
-                         {% if mode == 'indoor' %}
-                            checked
-                         {% endif %}>
-                  <span class="slider round"></span>
-                </label>
-            </form>
+            <div class="mode_toggle">
+                <form method="post" id="toggle" action="{% url 'dust:indoormode' %}">
+                    {% csrf_token %}
+                    <label class="switch">
+                      <input type="checkbox" name="switch" velue='yes' onchange="document.getElementById('toggle').submit()"
+                             {% if mode == 'indoor' %}
+                                checked
+                             {% endif %}>
+                      <span class="slider round"></span>
+                    </label>
+                </form>
+                <p>Indoor air quality map mode.</p>
+            </div>
         </div>
     </div>
 

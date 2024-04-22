@@ -82,3 +82,12 @@
 .veryunhealthy{
     color: #ED4000;
 }
+
+.mode_toggle{
+    display: flex;
+    color: #12E1B9;
+}
+.mode_toggle p {
+    margin-left: 10px;
+    margin-top: 10px;
+}
