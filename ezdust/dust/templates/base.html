@@ -59,12 +59,11 @@
             <a href="{% url 'dust:home'%}">Home</a>
             <p>Year-end project by Napasorn Tevarut and Thorung Boonkeaw</p>
         </div>
-
     </footer>
     <script>
         function initMap() {
             var districts = JSON.parse("{{district|escapejs}}");
-            var pm = JSON.parse("{{outdoor_pm|escapejs}}");
+            var pm = JSON.parse("{{pm|escapejs}}");
             var pk = JSON.parse("{{query_pk|escapejs}}");
             let map = new google.maps.Map(document.getElementById('map'), {
                 center: { lat: 13.736717, lng: 100.523186 },
@@ -118,7 +117,6 @@
         return color;
 
     }
-
 
     </script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBD10-SIHXzcvWAnaIi6b_5ABoJcuu-_Pg&callback=initMap">

@@ -102,6 +102,7 @@ def get_query_pk():
                 pk = i.pk
         pk_list.append(pk)
     return pk_list
+
 def HomePageView(request):
     """View for the home page displaying data of air quality in each district in bangkok."""
     indoor = get_queryset()
@@ -110,7 +111,7 @@ def HomePageView(request):
     pk = get_query_pk()
     print(outdoor_list)
     print(len(pk))
-    return render(request, 'dust/home_page.html', {'query_pk':pk,'health': health,'district': districts_json, 'indoor': indoor, 'outdoor_pm': outdoor_list, 'indoor_pm': indoor_list})
+    return render(request, 'dust/home_page.html', {'query_pk':pk,'health': health,'district': districts_json, 'indoor': indoor, 'pm': outdoor_list, 'mode':'outdoor'})
 
 
 def HomeDetail(request, pk):
@@ -118,7 +119,7 @@ def HomeDetail(request, pk):
     outdoor_list, indoor_list = district_pm()
     # get choosed indoor objects
     indoor = IndoorAir.objects.get(pk=pk)
-    return render(request, 'dust/home_detail.html', {'query_pk':qpk, 'district': districts_json, 'indoor': indoor, 'outdoor_pm': outdoor_list, 'indoor_pm': indoor_list})
+    return render(request, 'dust/home_detail.html', {'query_pk':qpk, 'district': districts_json, 'indoor': indoor, 'pm': outdoor_list, 'mode':'outdoor'})
 
 def SearchBar(request):
     pk = get_query_pk()
@@ -128,4 +129,16 @@ def SearchBar(request):
         results = IndoorAir.objects.filter(place__contains=query)
         for i in results:
             print(i.place)
-    return render(request, 'dust/home_page.html', {'query_pk':pk, 'district': districts_json, 'indoor': results, 'outdoor_pm': outdoor_list, 'indoor_pm': indoor_list})
+    return render(request, 'dust/home_page.html', {'query_pk':pk, 'district': districts_json, 'indoor': results, 'pm': outdoor_list, 'mode':'outdoor'})
+
+def ToggleSwitch(request):
+    indoor = get_queryset()
+    outdoor_list, indoor_list = district_pm()
+    health = Health.objects.all()
+    pk = get_query_pk()
+    if request.method == 'POST':
+        is_switch = 'switch' in request.POST
+        if is_switch:
+            return render(request, 'dust/home_page.html',
+                          {'query_pk':pk,'health': health,'district': districts_json, 'indoor': indoor, 'pm': indoor_list, 'mode': 'indoor'})
+    return redirect(reverse('dust:home'))

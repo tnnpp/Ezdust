@@ -21,6 +21,8 @@
                         <h5>Indoor Analysis: </h5>
                         <h4 id="indoor_pm_value">{{indoor.pm2_5}}</h4>
                     </div>
+                        <h5>Temperature: {{indoor.outdoor.temp}}</h5>
+                        <h5>Humidity: {{indoor.outdoor.humidity}}</h5>
                 </div>
                 <script>
                     var outdoor_pm = "{{ indoor.outdoor.pm2_5 }}";
@@ -55,6 +57,16 @@
         </div>
         <div class="col-md-5">
             <div id="map" class="map" ></div>
+             <form method="post" id="toggle" action="{% url 'dust:indoormode' %}">
+                {% csrf_token %}
+                <label class="switch">
+                  <input type="checkbox" name="switch" velue='yes' onchange="document.getElementById('toggle').submit()"
+                         {% if mode == 'indoor' %}
+                            checked
+                         {% endif %}>
+                  <span class="slider round"></span>
+                </label>
+            </form>
         </div>
     </div>
 

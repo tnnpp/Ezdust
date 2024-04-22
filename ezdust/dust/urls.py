@@ -13,5 +13,6 @@ urlpatterns = [
     path('search', views.SearchBar, name='search'),
     path('predict', views.PredictView, name='predict'),
     path('predict/result/<int:pk>', views.PredictResultView, name='result'),
-    path('analyze', views.AnalyzeView, name='analyze')
+    path('analyze', views.AnalyzeView, name='analyze'),
+    path('indoormode', views.ToggleSwitch, name='indoormode')
   ]
