@@ -43,7 +43,7 @@ bangkok_districts = {
     "Phaya_Thai": [13.78, 100.542778],
     "Phra_Khanong": [13.702222, 100.601667],
     "Phra_Nakhon": [13.764444, 100.499167],
-    "Pom_Prap Sattru Phai": [13.758056, 100.513056],
+    "Pom_Prap_Sattru_Phai": [13.758056, 100.513056],
     "Prawet": [13.716944, 100.694444],
     "Rat_Burana": [13.682222, 100.505556],
     "Ratchathewi": [13.758889, 100.534444],
