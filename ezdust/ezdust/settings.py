@@ -79,7 +79,7 @@ WSGI_APPLICATION = 'ezdust.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'b6510545519',
+        'NAME': 'group08',
         'USER': 'b6510545519',
         'PASSWORD': 'napasorn.te@ku.th',
         'HOST': 'iot.cpe.ku.ac.th',
