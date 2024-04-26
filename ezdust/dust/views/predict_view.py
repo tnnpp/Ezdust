@@ -6,6 +6,16 @@ from django.contrib import messages
 from ..models import OutdoorAir, IndoorAir, Health
 import datetime
 from ..forms import PredictForm
+import os
+import joblib
+from django.conf import settings
+import pandas as pd
+
+model_path = os.path.join(settings.BASE_DIR, 'dust/static/dust/model/indoorair_model.joblib')
+scaler_path = os.path.join(settings.BASE_DIR, 'dust/static/dust/model/scaler.joblib')
+
+model = joblib.load(model_path)
+scaler = joblib.load(scaler_path)
 
 def PredictView(request):
     if request.method == 'POST':
@@ -31,15 +41,25 @@ def PredictView(request):
                 humidity=latest_outdoor.humidity
             )
             predict_data.save()
-            # predict data
-            # todo : predict data, adding characteristic and number of people.
-            # this is dummy
+
+            # todo : load complete predict model
+            # this is dummy model
+            new_data = pd.DataFrame({
+                'outdoor_pm2_5': [predict_data.pm2_5],
+                'temp': [data['temperature']]
+            })
+            new_data_scaled = scaler.transform(new_data)
+            predicted = model.predict(new_data_scaled)
+            if predicted[0] < 0:
+                predicted[0] = 0
+            # end
+
             result = IndoorAir.objects.create(
                 outdoor=predict_data,
                 time=predict_time,
                 place=data['district'],
-                pm2_5=latest_outdoor.pm2_5,
-                temp=latest_outdoor.temp,
+                pm2_5=predicted[0],
+                temp=data['temperature'],
                 humidity=latest_outdoor.humidity
             )
             result.save()

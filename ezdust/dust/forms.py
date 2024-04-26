@@ -71,8 +71,8 @@ class PredictForm(forms.Form):
         label='Place',
         required=True
     )
-    people_num = forms.IntegerField(
+    temperature = forms.IntegerField(
         widget=forms.TextInput(attrs={'type': 'number'}),
-        label='People number',
+        label='temperature',
         required=True
     )
