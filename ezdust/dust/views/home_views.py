@@ -5,8 +5,19 @@ from django.urls import reverse
 from django.views import generic
 from ..models import OutdoorAir, IndoorAir, Health
 import datetime
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.utils import timezone
+import joblib
+import pandas as pd
+import os
+from django.conf import settings
+
+#load predict model
+model_path = os.path.join(settings.BASE_DIR, 'dust/static/dust/model/indoorair_model.joblib')
+scaler_path = os.path.join(settings.BASE_DIR, 'dust/static/dust/model/scaler.joblib')
+
+model = joblib.load(model_path)
+scaler = joblib.load(scaler_path)
 
 bangkok_districts = {
     "Bang_Bon": [13.6592, 100.3991],
@@ -60,31 +71,35 @@ bangkok_districts = {
     "Watthana": [13.742222, 100.585833],
     "Yan_Nawa": [13.696944, 100.543056]
 }
+
+
 districts_json = json.dumps(bangkok_districts)
 
 
-def get_queryset():
+def get_queryset(object):
     """
     Return latest time of IndoorAir of each place in bangkok
     """
     query = Q()
     for i in bangkok_districts.keys():
-        latest_indoor = IndoorAir.objects.filter(time__lte=datetime.datetime.now(), place=i).order_by(
+        latest = object.objects.filter(time__lte=datetime.datetime.now(), place=i).order_by(
             '-time').first()
-        if latest_indoor:
-            query |= Q(pk=latest_indoor.pk)
-    return IndoorAir.objects.filter(query)
+        if latest:
+            query |= Q(pk=latest.pk)
+    return object.objects.filter(query)
 
 
-def district_pm():
+def district_pm(indoor):
+    """
+    Return list of indoor and out door pm
+    """
     indoor_list = []
     outdoor_list = []
-    query = get_queryset()
 
     for j in bangkok_districts.keys():
         in_pm = -1
         out_pm = -1
-        for i in query:
+        for i in indoor:
             if j == i.place:
                 in_pm = i.pm2_5
                 out_pm = i.outdoor.pm2_5
@@ -92,53 +107,90 @@ def district_pm():
         outdoor_list.append(out_pm)
     return outdoor_list, indoor_list
 
-def get_query_pk():
-    query = get_queryset()
+def get_query_pk(indoor):
     pk_list = []
     for j in bangkok_districts.keys():
         pk = 0
-        for i in query:
+        for i in indoor:
             if j == i.place:
                 pk = i.pk
         pk_list.append(pk)
     return pk_list
 
+
+
+
+def predicted_data():
+    """Predict update data"""
+    outdoors_with_no_indoors = OutdoorAir.objects.annotate(num_indoorairs=Count('indoorair')).filter(num_indoorairs=0)
+    if outdoors_with_no_indoors:
+        for i in outdoors_with_no_indoors:
+            # todo : load complete predict model and removed to outdoorAir model's method
+            # this is dummy model
+            new_data = pd.DataFrame({
+                'outdoor_pm2_5': [i.pm2_5],
+                'temp': ['25']
+            })
+            new_data_scaled = scaler.transform(new_data)
+            predicted = model.predict(new_data_scaled)
+            if predicted[0] < 0:
+                predicted[0] = 0
+            # end
+            new_indoor = IndoorAir.objects.create(
+                outdoor=i,
+                time=i.time,
+                place=i.place,
+                pm2_5=predicted[0],
+                place_type='house',
+                temp=25
+            )
+
+
+
+
+
+
 def HomePageView(request):
     """View for the home page displaying data of air quality in each district in bangkok."""
-    indoor = get_queryset()
-    outdoor_list, indoor_list = district_pm()
+    predicted_data()
+    indoor = get_queryset(IndoorAir)
+    outdoor_list, indoor_list = district_pm(indoor)
     health = Health.objects.all()
-    pk = get_query_pk()
-    print(outdoor_list)
-    print(len(pk))
-    return render(request, 'dust/home_page.html', {'query_pk':pk,'health': health,'district': districts_json, 'indoor': indoor, 'pm': outdoor_list, 'mode':'outdoor'})
+    qpk = get_query_pk(indoor)
+
+    return render(request, 'dust/home_page.html', {'query_pk':qpk,'health': health,'district': districts_json, 'indoor': indoor, 'pm': outdoor_list, 'mode':'outdoor'})
 
 
 def HomeDetail(request, pk):
-    qpk = get_query_pk()
-    outdoor_list, indoor_list = district_pm()
     # get choosed indoor objects
+    predicted_data()
+    indoors = get_queryset(IndoorAir)
+    outdoor_list, indoor_list = district_pm(indoors)
+    health = Health.objects.all()
+    qpk = get_query_pk(indoors)
     indoor = IndoorAir.objects.get(pk=pk)
     return render(request, 'dust/home_detail.html', {'query_pk':qpk, 'district': districts_json, 'indoor': indoor, 'pm': outdoor_list, 'mode':'outdoor'})
 
 def SearchBar(request):
-    pk = get_query_pk()
-    outdoor_list, indoor_list = district_pm()
+    predicted_data()
+    indoor = get_queryset(IndoorAir)
+    outdoor_list, indoor_list = district_pm(indoor)
+    qpk = get_query_pk(indoor)
     if request.method == 'POST':
         query = request.POST.get('query', '')
         results = IndoorAir.objects.filter(place__contains=query)
         for i in results:
             print(i.place)
-    return render(request, 'dust/home_page.html', {'query_pk':pk, 'district': districts_json, 'indoor': results, 'pm': outdoor_list, 'mode':'outdoor'})
+    return render(request, 'dust/home_page.html', {'query_pk':qpk, 'district': districts_json, 'indoor': results, 'pm': outdoor_list, 'mode':'outdoor'})
 
 def ToggleSwitch(request):
-    indoor = get_queryset()
-    outdoor_list, indoor_list = district_pm()
+    indoor = get_queryset(IndoorAir)
+    outdoor_list, indoor_list = district_pm(indoor)
     health = Health.objects.all()
-    pk = get_query_pk()
+    qpk = get_query_pk(indoor)
     if request.method == 'POST':
         is_switch = 'switch' in request.POST
         if is_switch:
             return render(request, 'dust/home_page.html',
-                          {'query_pk':pk,'health': health,'district': districts_json, 'indoor': indoor, 'pm': indoor_list, 'mode': 'indoor'})
+                          {'query_pk':qpk,'health': health,'district': districts_json, 'indoor': indoor, 'pm': indoor_list, 'mode': 'indoor'})
     return redirect(reverse('dust:home'))
