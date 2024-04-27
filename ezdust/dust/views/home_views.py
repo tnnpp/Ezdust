@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.views import generic
 from ..models import OutdoorAir, IndoorAir, Health
 import datetime
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.utils import timezone
 import joblib
 import pandas as pd
@@ -88,10 +88,8 @@ def get_queryset(object):
             query |= Q(pk=latest.pk)
     return object.objects.filter(query)
 
-indoor = get_queryset(IndoorAir)
-outdoor = get_queryset(OutdoorAir)
 
-def district_pm():
+def district_pm(indoor):
     """
     Return list of indoor and out door pm
     """
@@ -109,7 +107,7 @@ def district_pm():
         outdoor_list.append(out_pm)
     return outdoor_list, indoor_list
 
-def get_query_pk():
+def get_query_pk(indoor):
     pk_list = []
     for j in bangkok_districts.keys():
         pk = 0
@@ -119,18 +117,15 @@ def get_query_pk():
         pk_list.append(pk)
     return pk_list
 
-def is_database_updated():
-    for i in indoor:
-        for j in outdoor:
-            if i.time != j.time:
-                return True
-    return False
+
+
 
 def predicted_data():
     """Predict update data"""
-    if is_database_updated():
-        for i in outdoor:
-            # todo : load complete predict model
+    outdoors_with_no_indoors = OutdoorAir.objects.annotate(num_indoorairs=Count('indoorair')).filter(num_indoorairs=0)
+    if outdoors_with_no_indoors:
+        for i in outdoors_with_no_indoors:
+            # todo : load complete predict model and removed to outdoorAir model's method
             # this is dummy model
             new_data = pd.DataFrame({
                 'outdoor_pm2_5': [i.pm2_5],
@@ -151,24 +146,36 @@ def predicted_data():
             )
 
 
-outdoor_list, indoor_list = district_pm()
-health = Health.objects.all()
-qpk = get_query_pk()
+
+
 
 
 def HomePageView(request):
     """View for the home page displaying data of air quality in each district in bangkok."""
-    print(is_database_updated())
     predicted_data()
+    indoor = get_queryset(IndoorAir)
+    outdoor_list, indoor_list = district_pm(indoor)
+    health = Health.objects.all()
+    qpk = get_query_pk(indoor)
+
     return render(request, 'dust/home_page.html', {'query_pk':qpk,'health': health,'district': districts_json, 'indoor': indoor, 'pm': outdoor_list, 'mode':'outdoor'})
 
 
 def HomeDetail(request, pk):
     # get choosed indoor objects
+    predicted_data()
+    indoors = get_queryset(IndoorAir)
+    outdoor_list, indoor_list = district_pm(indoors)
+    health = Health.objects.all()
+    qpk = get_query_pk(indoors)
     indoor = IndoorAir.objects.get(pk=pk)
     return render(request, 'dust/home_detail.html', {'query_pk':qpk, 'district': districts_json, 'indoor': indoor, 'pm': outdoor_list, 'mode':'outdoor'})
 
 def SearchBar(request):
+    predicted_data()
+    indoor = get_queryset(IndoorAir)
+    outdoor_list, indoor_list = district_pm(indoor)
+    qpk = get_query_pk(indoor)
     if request.method == 'POST':
         query = request.POST.get('query', '')
         results = IndoorAir.objects.filter(place__contains=query)
@@ -177,6 +184,10 @@ def SearchBar(request):
     return render(request, 'dust/home_page.html', {'query_pk':qpk, 'district': districts_json, 'indoor': results, 'pm': outdoor_list, 'mode':'outdoor'})
 
 def ToggleSwitch(request):
+    indoor = get_queryset(IndoorAir)
+    outdoor_list, indoor_list = district_pm(indoor)
+    health = Health.objects.all()
+    qpk = get_query_pk(indoor)
     if request.method == 'POST':
         is_switch = 'switch' in request.POST
         if is_switch:
