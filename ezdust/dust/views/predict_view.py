@@ -58,9 +58,9 @@ def PredictView(request):
                 outdoor=predict_data,
                 time=predict_time,
                 place=data['district'],
+                place_type=data['place'],
                 pm2_5=predicted[0],
                 temp=data['temperature'],
-                humidity=latest_outdoor.humidity
             )
             result.save()
             messages.success(request, "Predict your indoor air quality successful")
