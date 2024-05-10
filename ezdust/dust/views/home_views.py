@@ -11,6 +11,10 @@ import joblib
 import pandas as pd
 import os
 from django.conf import settings
+from matplotlib import pyplot as plt
+import io
+import base64
+
 
 #load predict model
 model_path = os.path.join(settings.BASE_DIR, 'dust/static/dust/model/indoorair_model.joblib')
@@ -169,7 +173,36 @@ def HomeDetail(request, pk):
     health = Health.objects.all()
     qpk = get_query_pk(indoors)
     indoor = IndoorAir.objects.get(pk=pk)
-    return render(request, 'dust/home_detail.html', {'query_pk':qpk, 'district': districts_json, 'indoor': indoor, 'pm': outdoor_list, 'mode':'outdoor'})
+
+    # Generate a plot for the IndoorAir data (example: temperature over time)
+    data = IndoorAir.objects.filter(place=indoor.place)  # or any other filtering based on your need
+    times = [d.time for d in data]
+    indoor_value = [d.pm2_5 for d in data]
+    outdoor_value = [d.outdoor.pm2_5 for d in data]
+
+    plt.figure(figsize=(5, 3))
+
+    plt.plot(times, indoor_value, label=f'Indoor predict for {indoor.place}', color='blue')
+    plt.plot(times, outdoor_value, label=f'Outdoor Data for {indoor.place}', color='red')
+    plt.title('Indoor Air Data Over Time')
+    plt.xlabel('Time')
+    plt.ylabel('Value')
+    plt.tick_params(axis='x', which='major', labelsize=6)
+    plt.grid(True)
+    plt.legend()
+
+    # Save the plot to a buffer
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    plt.close()
+    buffer.seek(0)
+
+    # Convert buffer to Django File and save or directly encode to base64
+    image_data = buffer.getvalue()
+    base64_encoded_result = base64.b64encode(image_data).decode('utf-8')
+    image_url = f"data:image/png;base64,{base64_encoded_result}"
+
+    return render(request, 'dust/home_detail.html', {'query_pk':qpk, 'district': districts_json, 'indoor': indoor, 'pm': outdoor_list, 'mode':'outdoor', 'graph_image_url': image_url})
 
 def SearchBar(request):
     predicted_data()

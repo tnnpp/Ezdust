@@ -16,13 +16,16 @@
                         <h1 id="outdoor_pm_value">{{indoor.outdoor.pm2_5}} </h1>
                         <h1 id="text_value"></h1>
                     </div>
-                        <h5>{{indoor.place}} District</h5>
+                    <h5>{{indoor.place}} District</h5>
                     <div class="indoor">
                         <h5>Indoor Analysis: </h5>
                         <h4 id="indoor_pm_value">{{indoor.pm2_5}}</h4>
                     </div>
-                        <h5>Temperature: {{indoor.outdoor.temp}}</h5>
-                        <h5>Humidity: {{indoor.outdoor.humidity}}</h5>
+                    <h5>Temperature: {{indoor.outdoor.temp}}</h5>
+                    <h5>Humidity: {{indoor.outdoor.humidity}}</h5>
+                    <div>
+                        <img src="{{ graph_image_url }}" alt="Indoor Air Data Graph">
+                    </div>
                 </div>
                 <script>
                     var outdoor_pm = "{{ indoor.outdoor.pm2_5 }}";
