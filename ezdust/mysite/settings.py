@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -52,7 +53,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'ezdust.urls'
+ROOT_URLCONF = 'mysite.urls'
 
 TEMPLATES = [
     {
@@ -70,26 +71,32 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'ezdust.wsgi.application'
+WSGI_APPLICATION = 'mysite.wsgi.application'
 
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+TESTING = 'test' in sys.argv or 'unittest' in sys.argv
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'group08',
-        'USER': 'b6510545519',
-        'PASSWORD': 'napasorn.te@ku.th',
-        'HOST': 'iot.cpe.ku.ac.th',
-        'PORT': '3306'
+# Use SQLite for testing and MySQL for production
+if TESTING:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': BASE_DIR / 'db.sqlite3',
-    # }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'group08',
+            'USER': 'b6510545519',
+            'PASSWORD': 'napasorn.te@ku.th',
+            'HOST': 'iot.cpe.ku.ac.th',
+            'PORT': '3306'
+        }
+    }
 
 
 # Password validation
