@@ -1,8 +1,7 @@
 from django.contrib import admin
-from dust.models import Health, IndoorAir, OutdoorAir
+from dust.models import IndoorAir, OutdoorAir
 
 # Register models
-admin.site.register(Health)
 admin.site.register(IndoorAir)
 admin.site.register(OutdoorAir)
 

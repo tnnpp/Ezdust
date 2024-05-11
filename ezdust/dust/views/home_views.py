@@ -1,12 +1,9 @@
 import json
-
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from django.views import generic
-from ..models import OutdoorAir, IndoorAir, Health
+from ..models import OutdoorAir, IndoorAir
 import datetime
 from django.db.models import Q, Count
-from django.utils import timezone
 import joblib
 import pandas as pd
 import os
@@ -129,10 +126,21 @@ def predicted_data():
     outdoors_with_no_indoors = OutdoorAir.objects.annotate(num_indoorairs=Count('indoorair')).filter(num_indoorairs=0)
     if outdoors_with_no_indoors:
         for i in outdoors_with_no_indoors:
-            # todo : load complete predict model and removed to outdoorAir model's method
-            # this is dummy model
+            # predict model
+            # discritize time in to 5 category
+            if 0 < i.time.hour <= 6:
+                time = 2
+            elif 6 < i.time.hour <= 12:
+                time = 3
+            elif 12 < i.time.hour <= 18:
+                time = 1
+            else:
+                time = 0
             new_data = pd.DataFrame({
-                'outdoor_pm2_5': [i.pm2_5],
+                'time_category':[time],
+                'outdoor_temp': [i.temp],
+                'outdoor_humidity': [i.humidity],
+                'outdoor_pm2_5' : [i.pm2_5],
                 'temp': ['25']
             })
             new_data_scaled = scaler.transform(new_data)
@@ -150,19 +158,14 @@ def predicted_data():
             )
 
 
-
-
-
-
 def HomePageView(request):
     """View for the home page displaying data of air quality in each district in bangkok."""
     predicted_data()
     indoor = get_queryset(IndoorAir)
     outdoor_list, indoor_list = district_pm(indoor)
-    health = Health.objects.all()
     qpk = get_query_pk(indoor)
 
-    return render(request, 'dust/home_page.html', {'query_pk':qpk,'health': health,'district': districts_json, 'indoor': indoor, 'pm': outdoor_list, 'mode':'outdoor'})
+    return render(request, 'dust/home_page.html', {'query_pk':qpk,'district': districts_json, 'indoor': indoor, 'pm': outdoor_list, 'mode':'outdoor'})
 
 
 def HomeDetail(request, pk):
@@ -170,12 +173,11 @@ def HomeDetail(request, pk):
     predicted_data()
     indoors = get_queryset(IndoorAir)
     outdoor_list, indoor_list = district_pm(indoors)
-    health = Health.objects.all()
     qpk = get_query_pk(indoors)
     indoor = IndoorAir.objects.get(pk=pk)
 
-    # Generate a plot for the IndoorAir data (example: temperature over time)
-    data = IndoorAir.objects.filter(place=indoor.place)  # or any other filtering based on your need
+    # Generate a plot for the IndoorAir data
+    data = IndoorAir.objects.filter(place=indoor.place)
     times = [d.time for d in data]
     indoor_value = [d.pm2_5 for d in data]
     outdoor_value = [d.outdoor.pm2_5 for d in data]
@@ -219,11 +221,10 @@ def SearchBar(request):
 def ToggleSwitch(request):
     indoor = get_queryset(IndoorAir)
     outdoor_list, indoor_list = district_pm(indoor)
-    health = Health.objects.all()
     qpk = get_query_pk(indoor)
     if request.method == 'POST':
         is_switch = 'switch' in request.POST
         if is_switch:
             return render(request, 'dust/home_page.html',
-                          {'query_pk':qpk,'health': health,'district': districts_json, 'indoor': indoor, 'pm': indoor_list, 'mode': 'indoor'})
+                          {'query_pk':qpk, 'district': districts_json, 'indoor': indoor, 'pm': indoor_list, 'mode': 'indoor'})
     return redirect(reverse('dust:home'))

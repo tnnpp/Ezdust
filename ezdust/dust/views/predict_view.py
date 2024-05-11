@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy, reverse
 from django.views import generic
 from django.contrib import messages
-from ..models import OutdoorAir, IndoorAir, Health
+from ..models import OutdoorAir, IndoorAir
 import datetime
 from ..forms import PredictForm
 import os
@@ -42,11 +42,22 @@ def PredictView(request):
             )
             predict_data.save()
 
-            # todo : load complete predict model
-            # this is dummy model
+            # predict model
+            # discritize time in to 5 category
+            if 0 < predict_data.time.hour <= 6:
+                time = 2
+            elif 6 < predict_data.time.hour <= 12:
+                time = 3
+            elif 12 < predict_data.time.hour <= 18:
+                time = 1
+            else:
+                time = 0
             new_data = pd.DataFrame({
+                'time_category': [time],
+                'outdoor_temp': [predict_data.temp],
+                'outdoor_humidity': [predict_data.humidity],
                 'outdoor_pm2_5': [predict_data.pm2_5],
-                'temp': [data['temperature']]
+                'temp': ['25']
             })
             new_data_scaled = scaler.transform(new_data)
             predicted = model.predict(new_data_scaled)

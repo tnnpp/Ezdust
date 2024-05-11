@@ -21,7 +21,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <p>Indoor & outdoor air quality with health analysis.</p>
+                            <p>Indoor & outdoor air quality analysis.</p>
                         </div>
                     </div>
                 </div>
@@ -34,8 +34,8 @@
                 </div>
                 <div class="col-md-3">
                     <div class="link">
-                        <form class="link1" action="{% url 'dust:analyze'%}" method="get">
-                            <input type="submit" value="Health Risk Analysis">
+                        <form class="link1" action="{% url 'dust:home'%}" method="get">
+                            <input type="submit" value="Home">
                         </form>
                     </div>
                 </div>
@@ -56,7 +56,6 @@
     {% endblock content %}
     <footer>
         <div class="foot">
-            <a href="{% url 'dust:home'%}">Home</a>
             <p>Year-end project by Napasorn Tevarut and Thorung Boonkeaw</p>
         </div>
     </footer>
