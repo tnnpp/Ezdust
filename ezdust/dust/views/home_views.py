@@ -1,5 +1,6 @@
 import json
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseNotFound
 from django.urls import reverse
 from ..models import OutdoorAir, IndoorAir
 import datetime
@@ -174,8 +175,9 @@ def HomeDetail(request, pk):
     indoors = get_queryset(IndoorAir)
     outdoor_list, indoor_list = district_pm(indoors)
     qpk = get_query_pk(indoors)
-    indoor = IndoorAir.objects.get(pk=pk)
-
+    indoor = get_object_or_404(IndoorAir,pk=pk)
+    if indoor not in indoors:
+        return HttpResponseNotFound()
     # Generate a plot for the IndoorAir data
     data = IndoorAir.objects.filter(place=indoor.place)
     times = [d.time for d in data]

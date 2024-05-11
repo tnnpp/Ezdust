@@ -63,7 +63,6 @@ def PredictView(request):
             predicted = model.predict(new_data_scaled)
             if predicted[0] < 0:
                 predicted[0] = 0
-            # end
 
             result = IndoorAir.objects.create(
                 outdoor=predict_data,
@@ -87,7 +86,8 @@ def PredictResultView(request, pk):
     try:
         result = IndoorAir.objects.get(pk=pk)
         if result.pm2_5 < 0:
-            text = "Impossible"
+            result.pm2_5 = 0
+            result.save()
         if result.pm2_5 <= 25:
             text = "Very Good air quality!"
         elif 26 <= result.pm2_5 <= 50:
@@ -102,4 +102,5 @@ def PredictResultView(request, pk):
         text = None
         result = None
         messages.error(request, "Haven't Predict yet.")
+        return redirect(reverse('dust:predict'))
     return render(request, 'dust/result.html', {'result': result, 'text': text})
