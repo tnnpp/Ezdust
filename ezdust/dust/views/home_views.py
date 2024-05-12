@@ -215,9 +215,7 @@ def SearchBar(request):
     qpk = get_query_pk(indoor)
     if request.method == 'POST':
         query = request.POST.get('query', '')
-        results = IndoorAir.objects.filter(place__contains=query)
-        for i in results:
-            print(i.place)
+        results = indoor.filter(place__contains=query)
     return render(request, 'dust/home_page.html', {'query_pk':qpk, 'district': districts_json, 'indoor': results, 'pm': outdoor_list, 'mode':'outdoor'})
 
 def ToggleSwitch(request):
