@@ -3,8 +3,8 @@ Second-Year End Project, 2023
 Software and Knowledge Engineering, Faculty of Engineering, Kasetsart University
 
 ### List of members
-* Napasorn Tevarut  
-* Thorung Bunkaew
+* Napasorn Tevarut  (6510545519)
+* Thorung Bunkaew   (6510545454)
 
 ### Project overview and features
 Our project addresses the critical issue of air pollution in Bangkok by focusing on indoor air quality. Given the escalating concerns about pollution's impact on health, we aim to assess and improve the air inside homes and buildings. Through our research, we seek to empower individuals to take proactive steps towards creating healthier indoor environments, contributing to overall well-being and sustainability.  
